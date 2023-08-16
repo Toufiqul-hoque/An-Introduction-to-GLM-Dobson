@@ -1,0 +1,215 @@
+##### ANSWER 10.2
+library(tidyverse)
+library(reshape2)
+library(MPV)
+data("table.b1")
+t<-table.b1
+library(leaps)
+t.bestsubset = regsubsets(y~t$x1+t$x2+t$x4+t$x7+t$x8+t$x9, data = t)
+summary(t.bestsubset)
+t.bestsubset.summary = summary(t.bestsubset)
+t.bestsubset.summary$rsq
+##We see that the  $R^2$  statistic increases slightly when a new variable is included in the model.
+adj_r2_max = which.max(t.bestsubset.summary$adjr2)
+adj_r2_max
+## adj r-squared choose model with 4 covariates. 
+r2_max = which.max(t.bestsubset.summary$rsq)
+r2_max
+t.bestsubset.summary$cp
+t.bestsubset.summary$rss
+#plot
+plot(t.bestsubset.summary$cp, xlab = "Number of Variables", ylab = "Cp", type = "l")
+cp_min = which.min(t.bestsubset.summary$cp)
+points(cp_min, t.bestsubset.summary$cp[cp_min], col = "red", cex = 2, pch = 20)
+
+plot(t.bestsubset.summary$bic, xlab = "Number of Variables", ylab = "BIC", type = "l")
+bic_min = which.min(t.bestsubset.summary$bic) 
+points(bic_min, t.bestsubset.summary$bic[bic_min], col = "red", cex = 2, pch = 20)
+
+plot(t.bestsubset.summary$rss, xlab = "Number of Variables", ylab = "RSS", type = "l")
+rss_min = which.min(t.bestsubset.summary$rss) 
+points(rss_min, t.bestsubset.summary$rss[rss_min], col = "red", cex = 2, pch = 20)
+
+```
+
+
+
+
+```{r}
+### ANSWER 10.4
+library(tidyverse)
+library(reshape2)
+library(MPV)
+data("table.b2")
+t2<-table.b2
+library(leaps)
+##########a.
+t2.forward = regsubsets(y~., data = t2, method = "forward")
+summary(t2.forward)
+t2.forward.summary = summary(t2.forward)
+t2.forward.summary$rsq
+adj_r2_max.a = which.max(t2.forward.summary$adjr2)
+adj_r2_max.a
+## adj r-squared choose model with 5 covariates. 
+r2_max.a = which.max(t2.forward.summary$rsq)
+r2_max.a
+#cp selects 4 covariates.
+t2.forward.summary$cp
+##rss selects 5 covariates.
+t2.forward.summary$rss
+
+
+
+
+###########b
+t2.backward = regsubsets(y~., data = t2, method = "backward")
+summary(t2.backward)
+t2.backward.summary = summary(t2.backward)
+t2.backward.summary$rsq
+adj_r2_max.a = which.max(t2.backward.summary$adjr2)
+adj_r2_max.a
+## adj r-squared choose model with 5 covariates. 
+r2_max.a = which.max(t2.backward.summary$rsq)
+r2_max.a
+#cp selects 4 covariates.
+t2.backward.summary$cp
+##rss selects 5 covariates.
+t2.backward.summary$rss
+
+
+########d
+
+library(olsrr)
+t2.lm = lm(y~.,  data = t2)
+ols_step_all_possible(t2.lm)
+
+###The plot method shows the panel of fit criteria for all possible regression methods.
+
+
+t2.lm.k <- ols_step_all_possible(t2.lm)
+plot(t2.lm.k)
+
+
+#####c
+
+ols_step_forward_p(t2.lm)
+
+plot(ols_step_forward_p(t2.lm))
+
+ols_step_forward_p(t2.lm, details = TRUE)
+
+##e all the models are compared above.
+  
+```
+
+
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(MPV)
+library(leaps)
+
+####a & b
+n <- read.csv(file.choose(), stringsAsFactors=FALSE)
+view(n)
+library(olsrr)
+n.lm = lm(n$Mort~n$Precip+n$Educ+n$Nonwhite+n$Nox+n$SO2,  data = n)
+ols_step_all_possible(n.lm)
+
+### Cp suggested Educ and Nonwhite.The plot method shows the panel of fit criteria for all possible regression methods.
+
+
+n.lm.k <- ols_step_all_possible(n.lm)
+plot(n.lm.k)
+
+##c no
+ols_step_forward_p(n.lm)
+
+plot(ols_step_forward_p(n.lm))
+
+ols_step_forward_p(n.lm, details = TRUE)
+
+
+
+```
+
+
+
+
+```{r}
+##########10.24
+library(tidyverse)
+library(reshape2)
+library(MPV)
+data("table.b14")
+t3<-table.b2
+library(leaps)
+t3.lm = lm(y~.,  data = t3)
+ols_step_all_possible(t3.lm)
+# Mallaows Cp is closely near to number of regressors i.e. 5 for model x1,x2,x3,x4 and x1,x2,x3,x4,x5So we can select these two models as a best subset models. Now from these two models we have to select one model.
+#Now, we fit a multiple linear regression for the model for regressors x1,x2,x3,x4
+
+#The output is:
+
+#Regression Analysis: y versus x1, x2, x3, x4, x5
+
+#The regression equation is
+#y = 2.85 - 0.290 x1 + 0.206 x2 + 0.454 x3 - 0.594 x4 + 0.0046 x5
+#Predictor Coef SE Coef T P
+#Constant 2.855 1.869 1.53 0.143
+#x1 -0.2905 0.1174 -2.47 0.023
+#x2 0.20572 0.07506 2.74 0.013
+#x3 0.4544 0.1877 2.42 0.026
+#x4 -0.5942 0.2125 -2.80 0.012
+#x5 0.00464 0.01817 0.26 0.801
+#S = 2.19553 R-Sq = 55.8% R-Sq(adj) = 44.2%
+#PRESS = 252.695 R-Sq(pred) = 0.00
+#Regression Analysis: y versus x1, x2, x3, x4
+
+#The regression equation is
+#y = 3.15 - 0.290 x1 + 0.199 x2 + 0.455 x3 - 0.609 x4
+#Predictor Coef SE Coef T P
+#Constant 3.148 1.439 2.19 0.041
+#x1 -0.2900 0.1146 -2.53 0.020
+#x2 0.19919 0.06891 2.89 0.009
+#x3 0.4554 0.1832 2.49 0.022
+#x4 -0.6092 0.1994 -3.05 0.006
+#S = 2.14360 R-Sq = 55.7% R-Sq(adj) = 46.8%
+#PRESS = 238.242 R-Sq(pred) = 0.00%
+#or the full model R square is 0.445 and PRESS statistic is 252.695 And for the reduced model R square is 0.468 and PRESS statistic is 238.242 So for the reduced model the value of R square is maximum and PRESS statistic is minimum so we can prefer the model with predictors x1,x2,x3,x4 as a best subset model.
+
+```
+
+
+```{r}
+##10.28
+library(tidyverse)
+library(reshape2)
+library(MPV)
+data("table.b14")
+t3<-table.b2
+dt3<-data.frame(t3)
+library(leaps)
+y<-log10(dt3$y)
+x1<-1/(sqrt(dt3$x1))
+x2<-sqrt(dt3$x2)
+x3<-1/(sqrt(dt3$x3))
+x4<-sqrt(dt3$x4)
+
+#######a
+dt3.lm = lm(y~.,  data = dt3)
+ols_step_all_possible(t2.lm)
+### x1 x2 x3 x4 is the appropriate model according to cp.
+
+#####b
+res <- resid(dt3.lm)
+qqnorm(res)
+plot(fitted(dt3.lm), res)
+##We can see that the residuals tend to stray from the line quite a bit near the tails, which could indicate that they’re not normally distributed.
+#####c
+t3or.lm = lm(y~.,  data = t3)
+summary(t3or.lm)
+ols_step_all_possible(t3or.lm)
+
+#### original model also suggests x1 x2 x3 x4 according to cp.
